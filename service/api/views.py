@@ -1,25 +1,26 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, FastAPI, HTTPException, Request, Depends, status
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 
 from service.api.auth import (
-    get_user,
-    users_db,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ALGORITHM,
+    SECRET_KEY,
     authenticate_user,
     create_access_token,
-    SECRET_KEY,
-    ALGORITHM,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+    get_user,
+    users_db,
 )
 from service.api.exceptions import UserNotFoundError
 from service.log import app_logger
-from service.models import User, Token, TokenData, RecoResponse, HTTPError
+from service.models import HTTPError, RecoResponse, Token, TokenData, User
 
 AVAILABLE_MODELS = ("first",)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 app = FastAPI()
+router = APIRouter()
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -42,12 +43,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-router = APIRouter()
-
-
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends()):
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
     user = authenticate_user(users_db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -95,7 +94,7 @@ async def get_reco(
     if model_name not in AVAILABLE_MODELS:
         raise HTTPException(status_code=404, detail="Model not found")
 
-    if user_id > 10 ** 9:
+    if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
     k_recs = request.app.state.k_recs
@@ -103,5 +102,5 @@ async def get_reco(
     return RecoResponse(user_id=user_id, items=reco)
 
 
-def add_views(app: FastAPI) -> None:
-    app.include_router(router)
+def add_views(current_app: FastAPI) -> None:
+    current_app.include_router(router)
