@@ -1,15 +1,34 @@
 from typing import List
 
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import APIRouter, FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 from service.api.exceptions import UserNotFoundError
 from service.log import app_logger
 
+AVAILABLE_MODELS = ("first",)
+
 
 class RecoResponse(BaseModel):
     user_id: int
     items: List[int]
+
+
+class HTTPError(BaseModel):
+    detail: str
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "errors": [
+                    {
+                        "error_key": "http_exception",
+                        "error_message": "Model not found",
+                        "error_loc": None,
+                    }
+                ]
+            }
+        }
 
 
 router = APIRouter()
@@ -26,7 +45,16 @@ async def health() -> str:
 @router.get(
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
-    response_model=RecoResponse,
+    responses={
+        200: {
+            "model": RecoResponse,
+            "description": "Computed recommendation",
+        },
+        404: {
+            "model": HTTPError,
+            "description": "Given recommendation model has been not found",
+        },
+    },
 )
 async def get_reco(
     request: Request,
@@ -35,7 +63,8 @@ async def get_reco(
 ) -> RecoResponse:
     app_logger.info(f"Request for model: {model_name}, user_id: {user_id}")
 
-    # Write your code here
+    if model_name not in AVAILABLE_MODELS:
+        raise HTTPException(status_code=404, detail="Model not found")
 
     if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
