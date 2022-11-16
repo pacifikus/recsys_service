@@ -17,6 +17,10 @@ uvicorn = "^0.14.0"
 orjson = "^3.7.7"
 starlette = "^0.14.2"
 black = "^22.10.0"
+python-multipart = "^0.0.5"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-dotenv = "^0.21.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
