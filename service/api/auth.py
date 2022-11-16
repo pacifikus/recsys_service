@@ -25,17 +25,21 @@ users_db = {
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_user(db, username: str):
+def get_user(db: dict, username: str) -> User:
     if username in db:
         user_dict = db[username]
         return User(**user_dict)
 
 
-def authenticate_user(db, username: str, password: str):
+def authenticate_user(
+    db: dict,
+    username: str,
+    password: str,
+) -> Union[User, bool]:
     user = get_user(db, username)
     if not user:
         return False
@@ -47,7 +51,7 @@ def authenticate_user(db, username: str, password: str):
 def create_access_token(
     data: dict,
     expires_delta: Union[timedelta, None] = None,
-):
+) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -58,5 +62,5 @@ def create_access_token(
     return encoded_jwt
 
 
-def get_password_hash(password):
+def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
