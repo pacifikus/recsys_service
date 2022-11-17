@@ -1,3 +1,4 @@
+import os.path
 import pickle
 from datetime import timedelta
 
@@ -18,13 +19,15 @@ from service.api.exceptions import UserNotFoundError
 from service.log import app_logger
 from service.models import HTTPError, RecoResponse, Token, TokenData, User
 
-AVAILABLE_MODELS = ("first",)
+AVAILABLE_MODELS = ("first", "most_popular")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 app = FastAPI()
 router = APIRouter()
 model_path = "models/most_popular.pkl"
-with open(model_path, "rb") as f:
-    model = pickle.load(f)
+
+if os.path.isfile(model_path):
+    with open(model_path, "rb") as f:
+        model = pickle.load(f)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -98,11 +101,14 @@ async def get_reco(
     if model_name not in AVAILABLE_MODELS:
         raise HTTPException(status_code=404, detail="Model not found")
 
-    if user_id > 10**9:
+    if user_id > 10 ** 9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
     k_recs = request.app.state.k_recs
-    reco = model.recommend([user_id], n=k_recs)[0].tolist()
+    if model_name == 'most_popular':
+        reco = model.recommend([user_id], n=k_recs)[0].tolist()
+    elif model_name == 'first':
+        reco = list(range(k_recs))
     return RecoResponse(user_id=user_id, items=reco)
 
 

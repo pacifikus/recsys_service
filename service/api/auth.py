@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Optional, Union
 
 from dotenv import find_dotenv, load_dotenv
 from jose import jwt
@@ -40,13 +40,11 @@ def authenticate_user(
     db: dict,
     username: str,
     password: str,
-) -> Union[User]:
+) -> Optional[User]:
     user = get_user(db, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
+    if user and verify_password(password, user.hashed_password):
+        return user
+    return None
 
 
 def create_access_token(
