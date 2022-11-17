@@ -14,4 +14,4 @@ jobs:
           python-version: "3.8"
       - run: pip install poetry
       - run: make setup
-      - run: pytest test -m "not secured"
+      - run: pytest tests -m "not secured"
