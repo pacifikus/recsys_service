@@ -16,7 +16,6 @@ pydantic = "^1.8.2"
 uvicorn = "^0.14.0"
 orjson = "^3.7.7"
 starlette = "^0.14.2"
-black = "^22.10.0"
 python-multipart = "^0.0.5"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
@@ -31,6 +30,7 @@ isort = "^5.8.0"
 bandit = "^1.7.0"
 flake8 = "^3.9.2"
 pylint = "~2.8.3"
+black = "^22.10.0"
 
 [tool.pytest.ini_options]
 markers = [
