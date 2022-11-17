@@ -40,13 +40,10 @@ def authenticate_user(
     db: dict,
     username: str,
     password: str,
-) -> Union[User]:
+) -> User:
     user = get_user(db, username)
-    if not user:
-        return False
-    if not verify_password(password, user.hashed_password):
-        return False
-    return user
+    if user and verify_password(password, user.hashed_password):
+        return user
 
 
 def create_access_token(
