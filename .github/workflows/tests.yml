@@ -1,7 +1,7 @@
-name: CICD
-on: [push]
-
-
+name: Tests
+on:
+  push:
+  pull_request:
 jobs:
   test:
     runs-on: ubuntu-20.04
@@ -14,5 +14,4 @@ jobs:
           python-version: "3.8"
       - run: pip install poetry
       - run: make setup
-      - run: make lint
       - run: make test
