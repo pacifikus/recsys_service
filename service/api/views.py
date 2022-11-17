@@ -1,3 +1,4 @@
+import pickle
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
@@ -21,6 +22,9 @@ AVAILABLE_MODELS = ("first",)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 app = FastAPI()
 router = APIRouter()
+model_path = "models/most_popular.pkl"
+with open(model_path, "rb") as f:
+    model = pickle.load(f)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -98,7 +102,7 @@ async def get_reco(
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
     k_recs = request.app.state.k_recs
-    reco = list(range(k_recs))
+    reco = model.recommend([user_id], n=k_recs)[0].tolist()
     return RecoResponse(user_id=user_id, items=reco)
 
 
