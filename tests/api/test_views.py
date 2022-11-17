@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import pytest
 from starlette.testclient import TestClient
 
 from service.settings import ServiceConfig
@@ -15,6 +16,7 @@ def test_health(
     assert response.status_code == HTTPStatus.OK
 
 
+@pytest.mark.secured
 def test_get_reco_success(
     client: TestClient,
     service_config: ServiceConfig,
@@ -32,6 +34,7 @@ def test_get_reco_success(
     assert all(isinstance(item_id, int) for item_id in response_json["items"])
 
 
+@pytest.mark.secured
 def test_get_reco_for_unknown_user(
     client: TestClient,
     valid_token_headers: str,
@@ -45,6 +48,7 @@ def test_get_reco_for_unknown_user(
     assert response.json()["errors"][0]["error_key"] == "user_not_found"
 
 
+@pytest.mark.secured
 def test_get_reco_for_unknown_model(
     client: TestClient,
     unknown_model: str,
