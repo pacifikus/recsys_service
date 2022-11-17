@@ -40,7 +40,7 @@ def authenticate_user(
     db: dict,
     username: str,
     password: str,
-) -> Union[User, bool]:
+) -> Union[User]:
     user = get_user(db, username)
     if not user:
         return False
