@@ -58,10 +58,10 @@ lint: isort flake mypy pylint
 
 # Test
 
-.pytest:
-	pytest
+.pytest-ci:
+	pytest -m "not secured"
 
-test: .venv .pytest
+test: .venv .pytest-ci
 
 
 # Docker

@@ -16,6 +16,11 @@ pydantic = "^1.8.2"
 uvicorn = "^0.14.0"
 orjson = "^3.7.7"
 starlette = "^0.14.2"
+python-multipart = "^0.0.5"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-dotenv = "^0.21.0"
+pandas = "^1.5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
@@ -25,6 +30,12 @@ isort = "^5.8.0"
 bandit = "^1.7.0"
 flake8 = "^3.9.2"
 pylint = "~2.8.3"
+black = "^22.10.0"
+
+[tool.pytest.ini_options]
+markers = [
+    "secured: tests with .env file required"
+]
 
 [build-system]
 requires = ["poetry>=1.0.5"]
