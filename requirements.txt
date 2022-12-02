@@ -26,8 +26,6 @@ fastapi==0.65.3
 filelock==3.8.0
 flake8==3.9.2
 Flask==2.2.2
-Flask-BasicAuth==0.2.0
-Flask-Cors==3.0.10
 gevent==22.10.2
 geventhttpclient==2.0.8
 gitdb==4.0.9
