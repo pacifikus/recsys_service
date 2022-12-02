@@ -13,5 +13,4 @@ jobs:
         with:
           python-version: "3.8"
       - run: pip install isort flake8 mypy pylint
-      - run: make setup
       - run: make lint
