@@ -15,5 +15,6 @@ jobs:
       - run: pip install isort flake8 mypy pylint
       - run: flake8 .
       - run: isort . --check --diff
-      - run: pylint .
+      - run: pylint service
+      - run: pylint src
       - run: mypy .
