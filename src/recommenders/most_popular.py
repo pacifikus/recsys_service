@@ -20,7 +20,9 @@ class MostPopularRecommender(BaseRecommender):
         self.recommendations = []
 
     def fit(self, df):
-        min_date = df[self.dt_column].max().normalize() - pd.DateOffset(days=self.days)
+        min_date = df[self.dt_column].max().normalize() - pd.DateOffset(
+            days=self.days
+        )
         self.recommendations = (
             df.loc[df[self.dt_column] > min_date, self.item_column]
             .value_counts()

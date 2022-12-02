@@ -9,8 +9,12 @@ interactions_df = pd.read_csv(data_file_path, parse_dates=[date_column])
 
 
 def simple_split(df, date_column_name):
-    train_df = df[interactions_df[date_column_name] < df[date_column_name].max()]
-    test_df = df[interactions_df[date_column_name] == df[date_column_name].max()]
+    train_df = df[
+        interactions_df[date_column_name] < df[date_column_name].max()
+    ]
+    test_df = df[
+        interactions_df[date_column_name] == df[date_column_name].max()
+    ]
     return train_df, test_df
 
 
