@@ -1,3 +1,4 @@
+import os
 import pickle
 from datetime import timedelta
 
@@ -31,7 +32,10 @@ router = APIRouter()
 config_path = "config.yml"
 config = read_config(config_path)
 userknn_model = UserKNN(config)
-popular_model = pickle.load(open(config["most_popular"]["model_path"], "rb"))
+
+if os.path.isfile(config["most_popular"]["model_path"]):
+    with open(config["most_popular"]["model_path"], "rb") as f:
+        popular_model = pickle.load(f)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -105,7 +109,7 @@ async def get_reco(
     if model_name not in AVAILABLE_MODELS:
         raise HTTPException(status_code=404, detail="Model not found")
 
-    if user_id > 10**9:
+    if user_id > 10 ** 9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
     reco = []
