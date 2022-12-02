@@ -1,4 +1,3 @@
-import os.path
 import pickle
 from datetime import timedelta
 
@@ -18,16 +17,21 @@ from service.api.auth import (
 from service.api.exceptions import UserNotFoundError
 from service.log import app_logger
 from service.models import HTTPError, RecoResponse, Token, TokenData, User
+from service.utils import read_config
+from src.recommenders import UserKNN
 
-AVAILABLE_MODELS = ("first", "most_popular")
+AVAILABLE_MODELS = (
+    "most_popular",
+    "userknn",
+)
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 app = FastAPI()
 router = APIRouter()
-model_path = "models/most_popular.pkl"
-
-if os.path.isfile(model_path):
-    with open(model_path, "rb") as f:
-        model = pickle.load(f)
+config_path = "config.yml"
+config = read_config(config_path)
+userknn_model = UserKNN(config)
+popular_model = pickle.load(open(config["most_popular"]["model_path"], "rb"))
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -101,14 +105,21 @@ async def get_reco(
     if model_name not in AVAILABLE_MODELS:
         raise HTTPException(status_code=404, detail="Model not found")
 
-    if user_id > 10 ** 9:
+    if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
+    reco = []
     k_recs = request.app.state.k_recs
-    if model_name == 'most_popular':
-        reco = model.recommend([user_id], n=k_recs)[0].tolist()
-    elif model_name == 'first':
-        reco = list(range(k_recs))
+    if model_name == "most_popular":
+        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+    elif model_name == "userknn":
+        if user_id in userknn_model.users_mapping:
+            reco = userknn_model.recommend([user_id])
+        else:
+            reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+        if len(reco) < 10:
+            reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
+            reco = list(set(reco))[:10]
     return RecoResponse(user_id=user_id, items=reco)
 
 
