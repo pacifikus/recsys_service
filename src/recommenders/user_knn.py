@@ -51,7 +51,8 @@ class UserKNN:
             with open(self.config['user_knn']['model_path'], 'rb') as f:
                 self.model = dill.load(f)
 
-            with open(self.config['user_knn']['users_mapping_path'], 'rb') as f:
+            with open(self.config['user_knn']['users_mapping_path'],
+                      'rb') as f:
                 self.users_mapping = dill.load(f)
 
             with open(
@@ -63,17 +64,24 @@ class UserKNN:
             print('models folder is empty...')
 
     def __load_train_data(self):
-        interactions = pd.read_csv(self.config['data']['interactions_path'])
-        interactions.rename(
-            columns={
-                'last_watch_dt': 'datetime',
-                'total_dur': 'weight',
-            },
-            inplace=True,
-        )
+        user_item_dict = None
+        try:
+            interactions = pd.read_csv(
+                self.config['data']['interactions_path'])
+            interactions.rename(
+                columns={
+                    'last_watch_dt': 'datetime',
+                    'total_dur': 'weight',
+                },
+                inplace=True,
+            )
 
-        interactions['datetime'] = pd.to_datetime(interactions['datetime'])
-        interactions['rank'] = interactions.groupby('user_id').cumcount() + 1
-        interactions = interactions[interactions['rank'] < 11]
-        user_item_dict = interactions.set_index('user_id')['item_id'].to_dict()
+            interactions['datetime'] = pd.to_datetime(interactions['datetime'])
+            interactions['rank'] = interactions.groupby(
+                'user_id').cumcount() + 1
+            interactions = interactions[interactions['rank'] < 11]
+            user_item_dict = interactions.set_index('user_id')[
+                'item_id'].to_dict()
+        except FileNotFoundError:
+            print('data folder is empty...')
         return user_item_dict
