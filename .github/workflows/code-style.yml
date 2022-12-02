@@ -13,4 +13,7 @@ jobs:
         with:
           python-version: "3.8"
       - run: pip install isort flake8 mypy pylint
-      - run: make lint
+      - run: flake8 .
+      - run: isort . --check --diff
+      - run: pylint .
+      - run: mypy .
