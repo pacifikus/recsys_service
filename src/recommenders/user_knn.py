@@ -51,8 +51,10 @@ class UserKNN:
             with open(self.config['user_knn']['model_path'], 'rb') as f:
                 self.model = dill.load(f)
 
-            with open(self.config['user_knn']['users_mapping_path'],
-                      'rb') as f:
+            with open(
+                self.config['user_knn']['users_mapping_path'],
+                'rb',
+            ) as f:
                 self.users_mapping = dill.load(f)
 
             with open(
