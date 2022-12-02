@@ -17,4 +17,3 @@ jobs:
       - run: isort . --check --diff
       - run: pylint service
       - run: pylint src
-      - run: mypy .
