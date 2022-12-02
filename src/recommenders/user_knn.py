@@ -47,17 +47,20 @@ class UserKNN:
         return list(set(similar_users_items))
 
     def __load_models(self):
-        with open(self.config['user_knn']['model_path'], 'rb') as f:
-            self.model = dill.load(f)
+        try:
+            with open(self.config['user_knn']['model_path'], 'rb') as f:
+                self.model = dill.load(f)
 
-        with open(self.config['user_knn']['users_mapping_path'], 'rb') as f:
-            self.users_mapping = dill.load(f)
+            with open(self.config['user_knn']['users_mapping_path'], 'rb') as f:
+                self.users_mapping = dill.load(f)
 
-        with open(
-            self.config['user_knn']['users_inv_mapping_path'],
-            'rb',
-        ) as f:
-            self.users_inv_mapping = dill.load(f)
+            with open(
+                self.config['user_knn']['users_inv_mapping_path'],
+                'rb',
+            ) as f:
+                self.users_inv_mapping = dill.load(f)
+        except FileNotFoundError:
+            print('models folder is empty...')
 
     def __load_train_data(self):
         interactions = pd.read_csv(self.config['data']['interactions_path'])
