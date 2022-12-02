@@ -93,8 +93,6 @@ python-dotenv==0.21.0
 python-jose==3.3.0
 python-multipart==0.0.5
 pytz==2022.6
-pywin32==305
-pywin32-ctypes==0.2.0
 PyYAML==6.0
 pyzmq==24.0.1
 -e git+https://github.com/pacifikus/recsys_service.git@8778cc10e52e4d6b11432dbeb0a5d76be60ac9c2#egg=reco_service
