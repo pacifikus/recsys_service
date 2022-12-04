@@ -118,19 +118,24 @@ async def get_reco(
     k_recs = request.app.state.k_recs
     if model_name == "most_popular":
         reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
-    elif model_name == "userknn":
-        if user_id in userknn_model.users_mapping:
-            reco = userknn_model.recommend([user_id])
-        else:
-            reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
-        if len(reco) < 10:
-            reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
-            reco = list(set(reco))[:10]
-    elif model_name == "lightfm":
-        if user_id in lightfm_model.users_mapping:
-            reco = lightfm_model.recommend([user_id])
-        else:
-            reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+    elif model_name == "userknn" and user_id in userknn_model.users_mapping:
+        reco = userknn_model.recommend([user_id])
+    elif (
+        model_name == "userknn" and
+        user_id not in userknn_model.users_mapping
+    ):
+        reco = userknn_model.recommend([user_id])
+        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+    elif model_name == "lightfm" and user_id in lightfm_model.users_mapping:
+        reco = lightfm_model.recommend([user_id])
+    elif (
+        model_name == "lightfm" and
+        user_id not in lightfm_model.users_mapping
+    ):
+        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+    if len(reco) < 10:
+        reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
+        reco = list(set(reco))[:10]
     return RecoResponse(user_id=user_id, items=reco)
 
 
