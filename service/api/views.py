@@ -19,11 +19,12 @@ from service.api.exceptions import UserNotFoundError
 from service.log import app_logger
 from service.models import HTTPError, RecoResponse, Token, TokenData, User
 from service.utils import read_config
-from src.recommenders import UserKNN
+from src.recommenders import LightFMWrapper, UserKNN
 
 AVAILABLE_MODELS = (
     "most_popular",
     "userknn",
+    "lightfm",
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -32,6 +33,7 @@ router = APIRouter()
 config_path = "config.yml"
 config = read_config(config_path)
 userknn_model = UserKNN(config)
+lightfm_model = LightFMWrapper(config)
 
 if os.path.isfile(config["most_popular"]["model_path"]):
     with open(config["most_popular"]["model_path"], "rb") as f:
@@ -124,6 +126,11 @@ async def get_reco(
         if len(reco) < 10:
             reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
             reco = list(set(reco))[:10]
+    elif model_name == "lightfm":
+        if user_id in lightfm_model.users_mapping:
+            reco = lightfm_model.recommend([user_id])
+        else:
+            reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
     return RecoResponse(user_id=user_id, items=reco)
 
 
