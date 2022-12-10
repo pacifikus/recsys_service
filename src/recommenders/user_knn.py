@@ -24,9 +24,6 @@ class UserKNN:
         recs = recs.set_index('user_id').apply(pd.Series.explode).reset_index()
         recs = recs[recs['user_id'] != recs['similar_user_id']]
         recs = self.__join_watched(recs)
-
-        # recs['rank'] = recs.groupby('user_id').cumcount() + 1
-        # recs = recs[recs['rank'] < n_recs + 1]
         return recs
 
     def __generate_implicit_recs_mapper(self, N):
@@ -70,20 +67,21 @@ class UserKNN:
         try:
             interactions = pd.read_csv(
                 self.config['data']['interactions_path'])
-            interactions.rename(
-                columns={
-                    'last_watch_dt': 'datetime',
-                    'total_dur': 'weight',
-                },
+            interactions.drop(
+                [
+                    'last_watch_dt',
+                    'total_dur',
+                ],
                 inplace=True,
+                axis=1,
             )
 
-            interactions['datetime'] = pd.to_datetime(interactions['datetime'])
             interactions['rank'] = interactions.groupby(
                 'user_id').cumcount() + 1
             interactions = interactions[interactions['rank'] < 11]
-            user_item_dict = interactions.set_index('user_id')[
-                'item_id'].to_dict()
+            user_item_dict = interactions.groupby('user_id')[
+                'item_id'
+            ].apply(list).to_dict()
         except FileNotFoundError:
             print('data folder is empty...')
         return user_item_dict
