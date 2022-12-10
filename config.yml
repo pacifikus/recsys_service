@@ -1,0 +1,13 @@
+data:
+  interactions_path: data/kion_train/interactions.csv
+  items_path: data/kion_train/items.csv
+  users_path: data/kion_train/users.csv
+
+user_knn:
+  model_path: models/userknn_bm25.dill
+  users_mapping_path: models/users_mapping.dill
+  users_inv_mapping_path: models/users_inv_mapping.dill
+  n_users: 30
+
+most_popular:
+  model_path: models/most_popular.pkl

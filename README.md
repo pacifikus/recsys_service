@@ -62,3 +62,19 @@ uvicorn main:app
 ```
 make run
 ```
+
+## Запуск тестов
+
+### Нагрузочное тестирование
+
+Нагрузочное тестирование реализовано с помощью инструемента [Locust](https://locust.io/) в `tests/locustfile.py`.
+Для запуска необходимо:
+- установить locust командой `pip install locust`
+- перейти в папку `tests`
+- запустить  locust web UI в терминале командой `locust`
+- открыть `http://localhost:8089/` и указать параметры теста (Number of users, Spawn rate, Host with running search server)
+- запустить тест
+
+Текущие результаты тестирования:
+- RPS: 123.2
+- Median response time: 350ms
