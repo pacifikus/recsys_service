@@ -75,6 +75,13 @@ make run
 - открыть `http://localhost:8089/` и указать параметры теста (Number of users, Spawn rate, Host with running search server)
 - запустить тест
 
-Текущие результаты тестирования:
-- RPS: 123.2
-- Median response time: 350ms
+Текущие результаты тестирования для модели LightFM:
+- Locust Setup
+  - Number of users (peak concurrency): 200
+  - Spawn rate (users added/stopped per second): 1
+- Results
+  - Max RPS: 113.4
+  - Max Median response time: 480
+
+
+![alt text](imgs/locust_stats.png)
