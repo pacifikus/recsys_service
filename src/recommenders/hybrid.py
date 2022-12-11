@@ -8,8 +8,6 @@ class HybridModelrapper:
         self.ranker = None
         self.ranker_data = None
         self.__load_models()
-        self.users = self.ranker_data["user_id"].unique()
-        self.recommend_all()
 
     def recommend_all(self):
         preds = self.ranker.predict(
@@ -57,5 +55,7 @@ class HybridModelrapper:
             )
             default_values = self.get_default_values()
             self.ranker_data.fillna(default_values, inplace=True)
+            self.users = self.ranker_data["user_id"].unique()
+            self.recommend_all()
         except FileNotFoundError:
             print("models folder is empty...")
