@@ -119,33 +119,25 @@ async def get_reco(
 
     reco = []
     k_recs = request.app.state.k_recs
-    if model_name == "most_popular":
-        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
-    elif model_name == "userknn" and user_id in userknn_model.users_mapping:
-        reco = userknn_model.recommend([user_id])
-    elif (
-        model_name == "userknn" and
-        user_id not in userknn_model.users_mapping
-    ):
-        reco = userknn_model.recommend([user_id])
-
-    elif model_name == "lightfm" and user_id in lightfm_model.users_mapping:
-        reco = lightfm_model.recommend([user_id])
-    elif (
-        model_name == "lightfm"
-        and user_id not in lightfm_model.users_mapping
-    ):
-        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
-
-    if model_name == "hybrid" and user_id in hybrid_model.users:
-        reco = hybrid_model.recommend(user_id, n=k_recs).tolist()
-    elif model_name == "hybrid" and user_id not in hybrid_model.users:
-        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+    reco = await get_recos_from_model(k_recs, model_name, reco, user_id)
 
     if len(reco) < 10:
         reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
         reco = list(set(reco))[:10]
     return RecoResponse(user_id=user_id, items=reco)
+
+
+async def get_recos_from_model(k_recs, model_name, reco, user_id):
+    reco = None
+    if model_name == "userknn" and user_id in userknn_model.users_mapping:
+        reco = userknn_model.recommend([user_id])
+    elif model_name == "lightfm" and user_id in lightfm_model.users_mapping:
+        reco = lightfm_model.recommend([user_id])
+    elif model_name == "hybrid" and user_id in hybrid_model.users:
+        reco = hybrid_model.recommend(user_id, n=k_recs).tolist()
+    if not reco:
+        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+    return reco
 
 
 def add_views(current_app: FastAPI) -> None:
