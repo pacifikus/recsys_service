@@ -19,12 +19,13 @@ from service.api.exceptions import UserNotFoundError
 from service.log import app_logger
 from service.models import HTTPError, RecoResponse, Token, TokenData, User
 from service.utils import read_config
-from src.recommenders import LightFMWrapper, UserKNN
+from src.recommenders import HybridModelrapper, LightFMWrapper, UserKNN
 
 AVAILABLE_MODELS = (
     "most_popular",
     "userknn",
     "lightfm",
+    "hybrid",
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -34,6 +35,8 @@ config_path = "config.yml"
 config = read_config(config_path)
 userknn_model = UserKNN(config)
 lightfm_model = LightFMWrapper(config)
+hybrid_model = HybridModelrapper(config)
+
 
 if os.path.isfile(config["most_popular"]["model_path"]):
     with open(config["most_popular"]["model_path"], "rb") as f:
@@ -111,7 +114,7 @@ async def get_reco(
     if model_name not in AVAILABLE_MODELS:
         raise HTTPException(status_code=404, detail="Model not found")
 
-    if user_id > 10 ** 9:
+    if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
     reco = []
@@ -125,14 +128,20 @@ async def get_reco(
         user_id not in userknn_model.users_mapping
     ):
         reco = userknn_model.recommend([user_id])
-        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+
     elif model_name == "lightfm" and user_id in lightfm_model.users_mapping:
         reco = lightfm_model.recommend([user_id])
     elif (
-        model_name == "lightfm" and
-        user_id not in lightfm_model.users_mapping
+        model_name == "lightfm"
+        and user_id not in lightfm_model.users_mapping
     ):
         reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+
+    if model_name == "hybrid" and user_id in hybrid_model.users:
+        reco = hybrid_model.recommend(user_id, n=k_recs).tolist()
+    elif model_name == "hybrid" and user_id not in hybrid_model.users:
+        reco = popular_model.recommend([user_id], n=k_recs)[0].tolist()
+
     if len(reco) < 10:
         reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
         reco = list(set(reco))[:10]

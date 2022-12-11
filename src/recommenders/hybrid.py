@@ -16,7 +16,9 @@ class HybridModelrapper:
             self.ranker_data.drop(columns=["user_id", "item_id"])
         )
         self.ranker_data["score"] = preds
-        self.ranker_data["rank"] = self.ranker_data.groupby("user_id").cumcount() + 1
+        self.ranker_data["rank"] = self.ranker_data.groupby(
+            "user_id"
+        ).cumcount() + 1
         self.ranker_data = self.ranker_data[self.ranker_data["rank"] < 11]
         self.ranker_data.sort_values(
             by=["user_id", "score"],
@@ -50,7 +52,9 @@ class HybridModelrapper:
             with open(self.config["hybrid"]["ranker"], "rb") as f:
                 self.ranker = dill.load(f)
 
-            self.ranker_data = pd.read_csv(self.config["hybrid"]["ranker_data"])
+            self.ranker_data = pd.read_csv(
+                self.config["hybrid"]["ranker_data"]
+            )
             default_values = self.get_default_values()
             self.ranker_data.fillna(default_values, inplace=True)
         except FileNotFoundError:
