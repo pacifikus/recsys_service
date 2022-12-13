@@ -9,7 +9,7 @@ class LoadTestUser(HttpUser):
 
     @task
     def get_recos(self):
-        model_name = "userknn"
+        model_name = "lightfm"
         user_id = random.randint(1, 100000)
         valid_token_headers = {
             "Authorization": f"Bearer {os.getenv('BOT_TOKEN')}"

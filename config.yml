@@ -11,3 +11,8 @@ user_knn:
 
 most_popular:
   model_path: models/most_popular.pkl
+
+lightfm:
+  model_path: models/lightfm.dill
+  users_mapping_path: models/users_mapping.dill
+  items_inv_mapping_path: models/items_inv_mapping.dill
