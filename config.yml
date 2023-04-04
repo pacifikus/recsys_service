@@ -16,3 +16,10 @@ lightfm:
   model_path: models/lightfm.dill
   users_mapping_path: models/users_mapping.dill
   items_inv_mapping_path: models/items_inv_mapping.dill
+
+hybrid:
+  ranker: models/lgbm_ranker_model_full.dill
+  popular_candidates: models/candidates/popular_candidates.csv
+  als_candidates: models/candidates/als_candidates.csv
+  lfm_candidates: models/candidates/lfm_candidates.csv
+  ranker_data: models/ranker_data.csv
