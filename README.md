@@ -85,3 +85,18 @@ make run
 
 
 ![alt text](imgs/locust_stats.png)
+
+
+## Мониторинг
+
+### ELK 
+
+Для запуска сбора логов в ELK необходимо:
+- запустить сервис
+- запустить Elasticsearch + Kibana + filebeat командой `docker-compose up`
+- зайти в консоль ELK и отфильтровать нужные логи
+
+![ELK](imgs/elk_logs.png)
+
+
+![ELK](imgs/logger_query.png)
