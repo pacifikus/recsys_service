@@ -100,3 +100,16 @@ make run
 
 
 ![ELK](imgs/logger_query.png)
+
+
+### Трекинг экспериментов с MLflow
+
+Для запуска MLflow сервера необходимо выполнить команду:
+
+```mlflow server --backend-store-uri=sqlite:///mlflow_recsys.db --default-artifact-root=file:mlflow_runs --host 0.0.0.0 --port 5001```
+
+Графический интерфейс MLflow можно запустить через `mlflow ui` 
+
+Лог эксперимента `popular_models`:
+
+![Popular models log](imgs/mlflow_runs_log.png)
