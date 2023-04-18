@@ -1,11 +1,10 @@
 import os
 
 import uvicorn
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from service.api.app import create_app
 from service.settings import get_config
-
-from prometheus_fastapi_instrumentator import Instrumentator
 
 config = get_config()
 app = create_app(config)
