@@ -17,3 +17,4 @@ pylint==2.8.3
 mypy==0.812
 flake8==3.9.2
 mlflow==2.2.2
+prometheus_fastapi_instrumentator==6.0.0

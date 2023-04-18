@@ -102,6 +102,16 @@ make run
 ![ELK](imgs/logger_query.png)
 
 
+### Prometheus + Grafana 
+
+Для запуска сбора метрик в Prometheus и отрисовки дашбордов необходимо:
+- запустить сервис
+- запустить Prometheus + Grafana командой `docker-compose -f docker-compose-prometheus.yml up`
+- зайти в http://localhost:3000 и настроить вид дашбордов
+
+![Grafana](imgs/grafana_dashboards.png)
+
+
 ### Трекинг экспериментов с MLflow
 
 Для запуска MLflow сервера необходимо выполнить команду:
