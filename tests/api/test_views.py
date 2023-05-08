@@ -6,6 +6,7 @@ from starlette.testclient import TestClient
 from service.settings import ServiceConfig
 
 GET_RECO_PATH = "/reco/{model_name}/{user_id}"
+GET_EXPLAIN_PATH = "/explain/{model_name}/{user_id}/{item_id}"
 
 
 def test_health(
@@ -88,3 +89,84 @@ def test_get_reco_without_token(
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json()["errors"][0]["error_message"] == "Not authenticated"
+
+
+@pytest.mark.secured
+def test_explain_item_exists(
+    client: TestClient,
+    valid_token_headers: str,
+):
+    user_id = 2
+    item_id = 13865
+    path = GET_EXPLAIN_PATH.format(
+        model_name="userknn",
+        user_id=user_id,
+        item_id=item_id,
+    )
+    with client:
+        response = client.get(path, headers=valid_token_headers)
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()["explanation"] == "Users like you also liked 13865"
+    assert response.json()["p"] == 28
+
+
+@pytest.mark.secured
+def test_explain_unknown_item(
+    client: TestClient,
+    valid_token_headers: str,
+):
+    user_id = 2
+    item_id = 10**10
+    path = GET_EXPLAIN_PATH.format(
+        model_name="userknn",
+        user_id=user_id,
+        item_id=item_id,
+    )
+    with client:
+        response = client.get(path, headers=valid_token_headers)
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert (
+        response.json()["errors"][0]["error_message"] == "Item not found for this user"
+    )
+
+
+@pytest.mark.secured
+def test_explain_unknown_model(
+    client: TestClient,
+    valid_token_headers: str,
+):
+    user_id = 2
+    item_id = 13865
+    path = GET_EXPLAIN_PATH.format(
+        model_name="first",
+        user_id=user_id,
+        item_id=item_id,
+    )
+    with client:
+        response = client.get(path, headers=valid_token_headers)
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert (
+        response.json()["errors"][0]["error_message"] == "Model couldn't be interpreted"
+    )
+
+
+@pytest.mark.secured
+def test_explain_unknown_user(
+    client: TestClient,
+    valid_token_headers: str,
+):
+    user_id = 10**10
+    item_id = 13865
+    path = GET_EXPLAIN_PATH.format(
+        model_name="userknn",
+        user_id=user_id,
+        item_id=item_id,
+    )
+    with client:
+        response = client.get(path, headers=valid_token_headers)
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json()["errors"][0]["error_key"] == "user_not_found"
