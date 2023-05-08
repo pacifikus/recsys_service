@@ -128,7 +128,8 @@ def test_explain_unknown_item(
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert (
-        response.json()["errors"][0]["error_message"] == "Item not found for this user"
+        response.json()["errors"][0]["error_message"]
+        == "Item not found for this user"
     )
 
 
@@ -149,7 +150,8 @@ def test_explain_unknown_model(
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert (
-        response.json()["errors"][0]["error_message"] == "Model couldn't be interpreted"
+        response.json()["errors"][0]["error_message"]
+        == "Model couldn't be interpreted"
     )
 
 
