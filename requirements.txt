@@ -11,7 +11,7 @@ pandas==1.5.1
 pyyaml==6.0
 dill==0.3.6
 scipy==1.9.3
-rectools==0.3.0
+#rectools==0.3.0
 pytest
 isort
 pylint==2.8.3
