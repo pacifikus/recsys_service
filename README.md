@@ -85,3 +85,41 @@ make run
 
 
 ![alt text](imgs/locust_stats.png)
+
+
+## Мониторинг
+
+### ELK 
+
+Для запуска сбора логов в ELK необходимо:
+- запустить сервис
+- запустить Elasticsearch + Kibana + filebeat командой `docker-compose up`
+- зайти в консоль ELK и отфильтровать нужные логи
+
+![ELK](imgs/elk_logs.png)
+
+
+![ELK](imgs/logger_query.png)
+
+
+### Prometheus + Grafana 
+
+Для запуска сбора метрик в Prometheus и отрисовки дашбордов необходимо:
+- запустить сервис
+- запустить Prometheus + Grafana командой `docker-compose -f docker-compose-prometheus.yml up`
+- зайти в http://localhost:3000 и настроить вид дашбордов
+
+![Grafana](imgs/grafana_dashboards.png)
+
+
+### Трекинг экспериментов с MLflow
+
+Для запуска MLflow сервера необходимо выполнить команду:
+
+```mlflow server --backend-store-uri=sqlite:///mlflow_recsys.db --default-artifact-root=file:mlflow_runs --host 0.0.0.0 --port 5001```
+
+Графический интерфейс MLflow можно запустить через `mlflow ui` 
+
+Лог эксперимента `popular_models`:
+
+![Popular models log](imgs/mlflow_runs_log.png)
