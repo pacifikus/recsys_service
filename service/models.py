@@ -28,6 +28,11 @@ class RecoResponse(BaseModel):
     items: List[int]
 
 
+class ExplainResponse(BaseModel):
+    p: int
+    explanation: str
+
+
 class HTTPError(BaseModel):
     detail: str
 

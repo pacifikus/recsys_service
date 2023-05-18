@@ -15,9 +15,16 @@ from service.api.auth import (
     get_user,
     users_db,
 )
-from service.api.exceptions import UserNotFoundError
+from service.api.exceptions import ItemNotFoundError, UserNotFoundError
 from service.log import app_logger
-from service.models import HTTPError, RecoResponse, Token, TokenData, User
+from service.models import (
+    ExplainResponse,
+    HTTPError,
+    RecoResponse,
+    Token,
+    TokenData,
+    User,
+)
 from service.utils import read_config
 from src.recommenders import HybridModelrapper, LightFMWrapper, UserKNN
 
@@ -36,7 +43,6 @@ config = read_config(config_path)
 userknn_model = UserKNN(config)
 lightfm_model = LightFMWrapper(config)
 hybrid_model = HybridModelrapper(config)
-
 
 if os.path.isfile(config["most_popular"]["model_path"]):
     with open(config["most_popular"]["model_path"], "rb") as f:
@@ -125,6 +131,50 @@ async def get_reco(
         reco += popular_model.recommend([user_id], n=k_recs)[0].tolist()
         reco = list(set(reco))[:10]
     return RecoResponse(user_id=user_id, items=reco)
+
+
+@router.get(
+    path="/explain/{model_name}/{user_id}/{item_id}",
+    tags=["Explanations"],
+    responses={
+        200: {
+            "model": ExplainResponse,
+            "description": "Computed explanation",
+        },
+        404: {
+            "model": HTTPError,
+            "description": "Given model couldn't be interpreted",
+        },
+    },
+)
+async def explain(
+    request: Request,
+    model_name: str,
+    user_id: int,
+    item_id: int,
+) -> ExplainResponse:
+    app_logger.info(f"Request for model: {model_name}, user_id: {user_id}")
+
+    if model_name != "userknn":
+        raise HTTPException(
+            status_code=404,
+            detail="Model couldn't be interpreted",
+        )
+
+    if user_id > 10**9:
+        raise UserNotFoundError(error_message=f"User {user_id} not found")
+
+    if user_id not in userknn_model.users_mapping:
+        return ExplainResponse(p=85, explanation="Popular now")
+
+    reco = userknn_model.get_interpretation(user_id, item_id)
+    if item_id not in reco["item_id"].values:
+        raise ItemNotFoundError(error_message="Item not found for this user")
+
+    return ExplainResponse(
+        p=int(reco[reco["item_id"] == item_id]["p"].values[0] * 100),
+        explanation=f"Users like you also liked {item_id}",
+    )
 
 
 async def get_recos_from_model(k_recs, model_name, reco, user_id):
