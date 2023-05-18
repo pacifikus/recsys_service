@@ -29,23 +29,24 @@ def get_config(service_config: ServiceConfig) -> tp.Dict[str, tp.Any]:
         "loggers": {
             "root": {
                 "level": level,
-                "handlers": ["console"],
+                "handlers": ["console", "file"],
                 "propagate": False,
             },
             app_logger.name: {
                 "level": level,
-                "handlers": ["console"],
+                "handlers": ["console", "file"],
                 "propagate": False,
             },
             access_logger.name: {
                 "level": level,
-                "handlers": ["access"],
+                "handlers": ["access", "file"],
                 "propagate": False,
             },
             "gunicorn.error": {
                 "level": "INFO",
                 "handlers": [
                     "console",
+                    "file",
                 ],
                 "propagate": False,
             },
@@ -53,6 +54,7 @@ def get_config(service_config: ServiceConfig) -> tp.Dict[str, tp.Any]:
                 "level": "ERROR",
                 "handlers": [
                     "gunicorn.access",
+                    "file",
                 ],
                 "propagate": False,
             },
@@ -60,6 +62,7 @@ def get_config(service_config: ServiceConfig) -> tp.Dict[str, tp.Any]:
                 "level": "INFO",
                 "handlers": [
                     "console",
+                    "file",
                 ],
                 "propagate": False,
             },
@@ -67,6 +70,7 @@ def get_config(service_config: ServiceConfig) -> tp.Dict[str, tp.Any]:
                 "level": "ERROR",
                 "handlers": [
                     "gunicorn.access",
+                    "file",
                 ],
                 "propagate": False,
             },
@@ -77,6 +81,11 @@ def get_config(service_config: ServiceConfig) -> tp.Dict[str, tp.Any]:
                 "class": "logging.StreamHandler",
                 "stream": "ext://sys.stdout",
                 "filters": ["service_name"],
+            },
+            "file": {
+                "formatter": "mini",
+                "class": "logging.FileHandler",
+                "filename": "recsys_service.log",
             },
             "access": {
                 "formatter": "access",
@@ -97,6 +106,16 @@ def get_config(service_config: ServiceConfig) -> tp.Dict[str, tp.Any]:
                     'time="%(asctime)s" '
                     'level="%(levelname)s" '
                     'service_name="%(service_name)s" '
+                    'logger="%(name)s" '
+                    'pid="%(process)d" '
+                    'message="%(message)s" '
+                ),
+                "datefmt": datetime_format,
+            },
+            "mini": {
+                "format": (
+                    'time="%(asctime)s" '
+                    'level="%(levelname)s" '
                     'logger="%(name)s" '
                     'pid="%(process)d" '
                     'message="%(message)s" '

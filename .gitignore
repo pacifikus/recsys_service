@@ -68,3 +68,5 @@ venv.bak/
 
 
 /poetry.lock
+/docker_volumes/
+/data/kion_train/

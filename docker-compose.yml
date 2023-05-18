@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+    elasticsearch:
+        image: elasticsearch:7.16.1
+        container_name: elasticsearch
+        environment:
+            - "discovery.type=single-node"
+        ports:
+            - "9200:9200"
+        volumes:
+            - elasticsearch_data:/usr/share/elasticsearch/data
+
+    kibana:
+        image: kibana:7.16.1
+        container_name: kibana
+        ports:
+            - "5601:5601"
+        environment:
+            - ELASTICSEARCH_HOSTS:http://elasticsearch:9200
+        depends_on:
+            - elasticsearch
+
+    filebeat:
+        build:
+            context: ./filebeat
+        container_name: filebeat
+        volumes:
+            - ./recsys_service:/recsys_service/
+        depends_on:
+            - elasticsearch
+            - kibana
+
+volumes:
+    elasticsearch_data:
+        driver: local
